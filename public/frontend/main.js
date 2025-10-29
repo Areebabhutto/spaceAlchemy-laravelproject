@@ -140,125 +140,161 @@ addToCartButtons.forEach((button) => {
   });
 });
 
+
 // ---------------------- CART PAGE ----------------------
-const cartItemsContainer = document.getElementById("cart-items");
-const cartTotal = document.getElementById("cart-total");
+// 🛒 CART PAGE SCRIPT — Compatible with old structure
+function renderCart() {
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const cartItemsContainer = document.getElementById('cart-items');
+  const cartTotalElement = document.getElementById('cart-total');
 
-if (cartItemsContainer) {
-  displayCartItems();
-}
+  if (!cartItemsContainer) return;
 
-function displayCartItems() {
-  cartItemsContainer.innerHTML = "";
-  let total = 0;
+  cartItemsContainer.innerHTML = '';
+  let total = 0;
 
-  if (cart.length === 0) {
-    cartItemsContainer.innerHTML = "<p class='text-center'>Your cart is empty!</p>";
-    document.querySelector(".cart-summary").style.display = "none";
-    return;
-  }
+  if (cart.length === 0) {
+    cartItemsContainer.innerHTML = `
+      <tr><td colspan="6" class="text-center py-4">Your cart is empty!</td></tr>
+    `;
+    document.querySelector(".cart-summary")?.classList.add("d-none");
+    return;
+  } else {
+    document.querySelector(".cart-summary")?.classList.remove("d-none");
+  }
 
-  cart.forEach((item, index) => {
-    total += item.price * item.quantity;
+  cart.forEach((item, index) => {
+    const itemName = item.title || item.name || "Unnamed Product";
+    const itemImage = item.image
+      ? (item.image.includes('/frontend/') ? item.image : '/frontend/' + item.image)
+      : '/frontend/images/default.jpg';
+    const itemPrice = parseFloat(item.price) || 0;
+    const itemQty = parseInt(item.quantity) || 1;
+    const itemTotal = itemPrice * itemQty;
+    total += itemTotal;
 
-    // 💡 CRITICAL FIX FOR DISPLAY: If the stored image path doesn't contain '/frontend/', 
-    // prepend it to handle items saved with the old, relative path ('images/...').
-    const safeImagePath = item.image.includes('/frontend/') ? item.image : '/frontend/' + item.image;
-
-    const itemHTML = `
-      <div class="col-md-4">
-        <div class="card">
-          <img src="${safeImagePath}" class="card-img-top" alt="${item.title}">
-          <div class="card-body text-center">
-            <h5 class="card-title">${item.title}</h5>
-            <p class="card-text">$${item.price} x ${item.quantity}</p>
-            <p><strong>Subtotal: $${item.price * item.quantity}</strong></p>
-            <button class="btn btn-danger remove-item" data-index="${index}">Remove</button>
-          </div>
-        </div>
-      </div>
-    `;
-    cartItemsContainer.innerHTML += itemHTML;
-  });
-
-  cartTotal.textContent = total.toFixed(2);
-
-  document.querySelectorAll(".remove-item").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const index = e.target.getAttribute("data-index");
-      cart.splice(index, 1);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      displayCartItems();
-      updateCartCount();
-    });
-  });
-}
-
-// ---------------------- CLEAR CART ----------------------
-const clearCartBtn = document.getElementById("clear-cart");
-if (clearCartBtn) {
-  clearCartBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to clear the cart?")) {
-      localStorage.removeItem("cart");
-      cart = [];
-      displayCartItems();
-      updateCartCount();
-    }
+    const row = `
+      <tr>
+        <td><img src="${itemImage}" alt="${itemName}" class="cart-img"></td>
+        <td>${itemName}</td>
+        <td>$${itemPrice.toFixed(2)}</td>
+        <td>
+          <div class="quantity-control">
+            <button class="decrement" data-index="${index}">-</button>
+            <input type="text" value="${itemQty}" readonly>
+            <button class="increment" data-index="${index}">+</button>
+          </div>
+        </td>
+        <td>$${itemTotal.toFixed(2)}</td>
+        <td><button class="btn-remove" data-index="${index}">Remove</button></td>
+      </tr>
+    `;
+    cartItemsContainer.insertAdjacentHTML('beforeend', row);
   });
+
+  cartTotalElement.textContent = total.toFixed(2);
+
+  document.querySelectorAll('.increment').forEach(btn =>
+    btn.addEventListener('click', incrementQty)
+  );
+  document.querySelectorAll('.decrement').forEach(btn =>
+    btn.addEventListener('click', decrementQty)
+  );
+  document.querySelectorAll('.btn-remove').forEach(btn =>
+    btn.addEventListener('click', removeItem)
+  );
 }
+
+function incrementQty(e) {
+  const index = e.target.dataset.index;
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  cart[index].quantity++;
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderCart();
+}
+
+function decrementQty(e) {
+  const index = e.target.dataset.index;
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  if (cart[index].quantity > 1) {
+    cart[index].quantity--;
+  } else {
+    cart.splice(index, 1);
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderCart();
+}
+
+function removeItem(e) {
+  const index = e.target.dataset.index;
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  cart.splice(index, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderCart();
+}
+
+//  Clear Cart
+document.getElementById('clear-cart')?.addEventListener('click', () => {
+  localStorage.removeItem('cart');
+  renderCart();
+});
+
+//  Initialize on page load
+document.addEventListener('DOMContentLoaded', renderCart);
+
+
 
 // ---------------------- CHECKOUT ----------------------
 const checkoutBtn = document.getElementById("checkout-btn");
 if (checkoutBtn) {
-  checkoutBtn.addEventListener("click", () => {
-    // Fixed to redirect to the Laravel route
-    window.location.href = "/checkout"; 
-  });
+  checkoutBtn.addEventListener("click", () => {
+    window.location.href = "/checkout"; 
+  });
 }
-
 
 // ---------------------- CHECKOUT PAGE ----------------------
 document.addEventListener("DOMContentLoaded", () => {
-  const checkoutItems = document.getElementById("checkoutItems");
-  const checkoutTotal = document.getElementById("checkoutTotal");
-  const checkoutForm = document.getElementById("checkoutForm");
+  const checkoutItems = document.getElementById("checkoutItems");
+  const checkoutTotal = document.getElementById("checkoutTotal");
+  const checkoutForm = document.getElementById("checkoutForm");
+  const confirmationMessage = document.getElementById("confirmationMessage");
 
-  if (checkoutItems && checkoutTotal && checkoutForm) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if (checkoutItems && checkoutTotal && checkoutForm) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    if (cart.length === 0) {
-      checkoutItems.innerHTML = "<p>Your cart is empty.</p>";
-    } else {
-      cart.forEach((item) => {
-        // 💡 CRITICAL FIX FOR CHECKOUT IMAGES: Ensure path correction is applied when rendering from localStorage
+    if (cart.length === 0) {
+      checkoutItems.innerHTML = "<p>Your cart is empty.</p>";
+      checkoutForm.style.display = "none";
+    } else {
+      cart.forEach((item) => {
         const safeImagePath = item.image.includes('/frontend/') ? item.image : '/frontend/' + item.image;
-        
-        const div = document.createElement("div");
-        div.classList.add("checkout-item");
-        div.innerHTML = `
-          <div class="checkout-item">
-            <img src="${safeImagePath}" alt="${item.title}" style="width:50px; height:50px; border-radius:6px; margin-right:10px;">
-            <span>${item.title} - ${item.quantity} × $${item.price}</span>
-          </div>
-        `;
-        checkoutItems.appendChild(div);
-      });
+        const div = document.createElement("div");
+        div.classList.add("checkout-item");
+        div.innerHTML = `
+          <div class="checkout-item">
+            <img src="${safeImagePath}" alt="${item.title}" style="width:50px; height:50px; border-radius:6px; margin-right:10px;">
+            <span>${item.title} - ${item.quantity} × $${item.price}</span>
+          </div>
+        `;
+        checkoutItems.appendChild(div);
+      });
 
-      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      checkoutTotal.textContent = total.toFixed(2);
-    }
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      checkoutTotal.textContent = total.toFixed(2);
+    }
 
-    checkoutForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      localStorage.removeItem("cart");
-      showNotification("✅ Your order has been placed successfully!\nThank you for shopping with us.");
-      window.location.href = "index.html"; // We can keep this index.html if you don't have a success route
-    });
-  }
+    checkoutForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // Hide form and show confirmation
+      checkoutForm.style.display = "none";
+      confirmationMessage.style.display = "block";
+
+      // Clear cart
+      localStorage.removeItem("cart");
+    });
+  }
 });
-
-
-
 
 
 

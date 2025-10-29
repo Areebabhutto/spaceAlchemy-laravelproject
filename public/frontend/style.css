@@ -209,6 +209,77 @@ nav ul li a.active {
 
 
 
+
+
+
+
+
+
+
+.best-sellers {
+  margin-top: 0 !important; /* keep only a small space */
+  padding-top: 0 !important;
+  margin-bottom: 7rem;
+}
+
+/* Best Selling Products - Simple Styling */
+.best-sellers .product-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Simple hover effect */
+.best-sellers .product-card:hover {
+  transform: translateY(-5px);
+  transition: 0.3s ease;
+}
+
+/* Responsive adjustment for smaller screens */
+@media (max-width: 768px) {
+  .best-sellers .product-card img {
+    height: 180px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Product Detail Page Styling */
+.product-detail img#productImage {
+  width: 300px;         /* smaller, fixed width */
+  height: 300px;        /* keeps uniform square look */
+  object-fit: cover;    /* crops neatly */
+  border-radius: 10px;  /* smooth corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* subtle shadow */
+}
+
+/* Center image on smaller screens */
+@media (max-width: 768px) {
+  .product-detail img#productImage {
+    width: 220px;
+    height: 220px;
+  }
+}
+
+
+
+
+
+
+
+
+
 .heading{
     font-size: 4rem;
     text-align: center;
@@ -469,6 +540,7 @@ nav ul li a.active {
 .product-detail img {
   max-width: 100%;
   border-radius: 10px;
+  margin-top: 70px;
 }
 
 .product-detail h2 {
@@ -480,6 +552,16 @@ nav ul li a.active {
 .product-detail p {
   font-size: 1.4rem;
 }
+
+
+/* Optional: tweak for smaller screens */
+@media (max-width: 768px) {
+  .product-detail img {
+    margin-top: 40px;
+    margin-bottom: 30px;
+  }
+}
+
 
 .reviews {
   background: #f8f9fa;
@@ -540,26 +622,79 @@ nav ul li a.active {
 }
 
 
-
-
 .cart-section {
   padding-bottom: 120px;
 }
 
-.cart-section .card {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  border: none;
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #faf9f6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.cart-section .card img {
-  height: 200px;
+.cart-header {
+  background-color: #1b1b1b;
+  color: white;
+  font-weight: 600;
+}
+
+.cart-table th, .cart-table td {
+  text-align: center;
+  padding: 15px;
+  vertical-align: middle;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-table img {
+  width: 100px;
+  height: 100px;
   object-fit: cover;
+  border-radius: 8px;
+}
+
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.quantity-control button {
+  border: none;
+  background: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.quantity-control input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  background: transparent;
+}
+
+.btn-remove {
+  background-color: #1b1b1b;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-remove:hover {
+  background-color: #dc3545;
 }
 
 .cart-summary {
   border-top: 2px solid #ccc;
   padding-top: 20px;
 }
+
+
+
 
 
 

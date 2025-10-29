@@ -36,7 +36,7 @@
     <div id="confirmationMessage" style="display: none;" class="hidden">
       <h3>✅ Order Placed Successfully!</h3>
       <p>Thank you for shopping with us.</p>
-      <a href="index.html" class="btn">Go Home</a>
+      <a href="{{ url('/') }}" class="btn btn-outline-primary">Go Home</a>
     </div>
   </div>
 

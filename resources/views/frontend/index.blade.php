@@ -3,7 +3,7 @@
 @section('main.container')
 
 
-
+ <!-- home section starts -->
 <section id="home" class="home container-fluid p-0">
 
 <div class="row hero">
@@ -41,6 +41,64 @@
 
  <!-- home section ends -->
 
+
+
+
+
+
+
+
+
+ <!-- best selling products section starts -->
+
+<section id="best-sellers" class="best-sellers container mt-5 pt-5">
+  <h1 class="heading text-center mb-5">Best Selling Products</h1>
+
+  <div class="row g-4 justify-content-center">
+
+    <!-- Best Seller 1 -->
+    <div class="col-md-4">
+      <div class="card product-card text-center">
+        <a href="{{ url('/product-detail') }}?id=1">
+          <img src="{{ asset('frontend/images/sofa.jpg') }}" class="card-img-top" alt="Modern Sofa">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">Modern 3-Seater Sofa</h5>
+          <p class="card-text text-primary fw-bold">$799</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Seller 2 -->
+    <div class="col-md-4">
+      <div class="card product-card text-center">
+        <a href="{{ url('/product-detail') }}?id=5">
+          <img src="{{ asset('frontend/images/curtain.jpg') }}" class="card-img-top" alt="Luxury Curtains">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">Luxury Curtains</h5>
+          <p class="card-text text-primary fw-bold">$99</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Seller 3 -->
+    <div class="col-md-4">
+      <div class="card product-card text-center">
+        <a href="{{ url('/product-detail') }}?id=11">
+          <img src="{{ asset('frontend/images/mirror.jpg') }}" class="card-img-top" alt="Mirror">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">Mirror</h5>
+          <p class="card-text text-primary fw-bold">$899</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- best selling products section ends -->
 
 
 
