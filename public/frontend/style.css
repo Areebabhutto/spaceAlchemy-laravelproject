@@ -517,51 +517,51 @@ nav ul li a.active {
 
 
 
-.product-detail{
-    margin-top: 250px; /* space from top */
+
+
+
+
+
+.product-detail {
+    margin-top: 180px; /* space from top */
 }
 
+/* THIS RULE NOW MAKES ALL IMAGES UNIFORM */
 .product-detail img {
-  max-width: 100%;
-  border-radius: 10px;
-  margin-top: 70px;
+    /* 1. Set Fixed Dimensions (Standard Size) */
+    width: 350px;           
+    height: 350px;          
+
+    /* 2. Crucial for uniformity: scales and crops the image 
+       to fill the fixed area without stretching. */
+    object-fit: cover;      
+    
+    border-radius: 10px;
+    
+    /* Added modern styling from the removed #productImage rule */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
 }
 
 .product-detail h2 {
-  font-size: 2.5rem;
-  color: var(--blue);
-  margin-bottom: 1rem;
+    font-size: 2.5rem;
+    color: var(--blue);
+    margin-bottom: 1rem;
 }
 
 .product-detail p {
-  font-size: 1.4rem;
+    font-size: 1.4rem;
 }
 
 
-/* Optional: tweak for smaller screens */
+/* --- Responsive Tweak for Smaller Screens --- */
 @media (max-width: 768px) {
-  .product-detail img {
-    margin-top: 40px;
-    margin-bottom: 30px;
-  }
-}
-
-
-/* Product Detail Page Styling */
-.product-detail img#productImage {
-  width: 300px;         /* smaller, fixed width */
-  height: 300px;        /* keeps uniform square look */
-  object-fit: cover;    /* crops neatly */
-  border-radius: 10px;  /* smooth corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* subtle shadow */
-}
-
-/* Center image on smaller screens */
-@media (max-width: 768px) {
-  .product-detail img#productImage {
-    width: 220px;
-    height: 220px;
-  }
+    .product-detail img {
+        /* On small screens, take up full available width but maintain a consistent, reduced height */
+        width: 100%;
+        height: 250px; /* Adjust height for mobile viewing */
+        margin-top: 40px;
+        margin-bottom: 30px;
+    }
 }
 
 

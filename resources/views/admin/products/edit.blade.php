@@ -5,7 +5,7 @@
 
      <div class="py-4 d-flex justify-content-center">
     <div class="w-50"> 
-        <form action="{{ route('products.update', $product->id) }}" method="POST">
+        <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-3">
@@ -20,6 +20,12 @@
                 <label class="form-label">Price</label>
                 <input type="number" step="0.01" class="form-control" name="price" value="{{ old('price', $product->price) }}" required>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">Product Image</label>
+                <input type="file" class="form-control" name="image">
+            </div>
+            
             <button type="submit" class="btn btn-success">Update Product</button>
             <a href="{{ route('products.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
