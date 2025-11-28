@@ -116,35 +116,21 @@
 
 <div class="box-container mx-auto">
 
+  @foreach($services as $service)
   <div class="box">
-    <div class="fas fa-palette"></div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex unde assumenda odio sint voluptatibus sed, quae deserunt fugit voluptates nisi!</p>
+    @if($service->icon)
+      @if(Storage::disk('public')->exists($service->icon))
+        <img src="{{ asset('storage/' . $service->icon) }}" alt="{{ $service->title }}" style="width: 60px; height: 60px;">
+      @else
+        <div class="fas {{ $service->icon }}"></div>
+      @endif
+    @else
+      <div class="fas fa-star"></div>
+    @endif
+    <h3>{{ $service->title }}</h3>
+    <p>{{ $service->description }}</p>
   </div>
-
-  <div class="box">
-    <div class="fas fa-tools"></div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex unde assumenda odio sint voluptatibus sed, quae deserunt fugit voluptates nisi!</p>
-  </div>
-
-  <div class="box">
-    <div class="fas fa-house-user"></div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex unde assumenda odio sint voluptatibus sed, quae deserunt fugit voluptates nisi!</p>
-  </div>
-
-  <div class="box">
-    <div class="fas fa-couch"></div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex unde assumenda odio sint voluptatibus sed, quae deserunt fugit voluptates nisi!</p>
-  </div>
-
-  <div class="box">
-    <div class="fas fa-bed"></div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex unde assumenda odio sint voluptatibus sed, quae deserunt fugit voluptates nisi!</p>
-  </div>
-
-  <div class="box">
-    <div class="fas fa-bath"></div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex unde assumenda odio sint voluptatibus sed, quae deserunt fugit voluptates nisi!</p>
-  </div>
+  @endforeach
 
 </div>
 

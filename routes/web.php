@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
 // Admin routes
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('products', BackendProductController::class);
+    Route::resource('services', \App\Http\Controllers\BackendServiceController::class);
 });
 
 require __DIR__.'/auth.php';
