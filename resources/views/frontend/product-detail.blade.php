@@ -22,7 +22,7 @@
                 <button class="btn btn-outline-secondary increment" type="button">+</button>
             </div>
 
-            <button class="btn btn-primary" id="addToCartDetail">Add to Cart</button>
+            <button class="btn btn-primary" id="addToCartDetail" type="button" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-price="{{ $product->price }}" data-product-image="{{ asset('storage/'.$product->image) }}">Add to Cart</button>
         </div>
     </div>
 
@@ -39,5 +39,73 @@
         </form>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const addToCartDetailBtn = document.getElementById("addToCartDetail");
+  
+  if (addToCartDetailBtn) {
+    addToCartDetailBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      
+      const detailQty = document.getElementById("detailQty");
+      const quantity = parseInt(detailQty.value) || 1;
+      const title = this.dataset.productName;
+      const price = parseFloat(this.dataset.productPrice);
+      const image = this.dataset.productImage;
+
+      console.log("Adding to cart - Detail Page", { title, price, image, quantity });
+
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existingItem = cart.find((item) => item.title === title);
+      
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ title, price, image, quantity });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+      console.log("Cart saved:", cart);
+      
+      // Update cart count
+      const cartCount = document.getElementById("cart-count");
+      if (cartCount) {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+      }
+      
+      alert(`${title} added to cart!`);
+      detailQty.value = 1;
+    });
+  }
+  
+  // Quantity controls
+  const detailQty = document.getElementById("detailQty");
+  if (detailQty) {
+    const quantitySelector = detailQty.closest(".quantity-selector");
+    if (quantitySelector) {
+      const incrementBtn = quantitySelector.querySelector(".increment");
+      const decrementBtn = quantitySelector.querySelector(".decrement");
+      
+      if (incrementBtn) {
+        incrementBtn.addEventListener("click", function(e) {
+          e.preventDefault();
+          detailQty.value = parseInt(detailQty.value) + 1;
+        });
+      }
+      
+      if (decrementBtn) {
+        decrementBtn.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (parseInt(detailQty.value) > 1) {
+            detailQty.value = parseInt(detailQty.value) - 1;
+          }
+        });
+      }
+    }
+  }
+});
+</script>
 
 @endsection

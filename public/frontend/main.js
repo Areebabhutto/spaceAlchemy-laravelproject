@@ -105,38 +105,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ---------------------- CART FUNCTIONALITY ----------------------
 const cartCount = document.getElementById("cart-count");
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function updateCartCount() {
   if (cartCount) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartCount.textContent = totalItems;
   }
 }
 updateCartCount();
 
-// ---------------------- PRODUCT PAGE ----------------------
-const addToCartButtons = document.querySelectorAll(".add-to-cart");
+// ---------------------- PRODUCT PAGE - ADD TO CART ----------------------
+document.addEventListener('DOMContentLoaded', function() {
+  const addToCartButtons = document.querySelectorAll(".add-to-cart");
 
-addToCartButtons.forEach((button) => {
-  button.addEventListener("click", (e) => {
-    const card = e.target.closest(".card");
-    const title = card.querySelector(".card-title").textContent;
-    const price = parseFloat(card.querySelector(".card-text").textContent.replace("$", ""));
-    const image = card.querySelector("img").src;
-    const qtyInput = card.querySelector(".qty-input");
-    const quantity = parseInt(qtyInput.value) || 1;
+  addToCartButtons.forEach((button) => {
+    button.addEventListener("click", (e) => {
+      e.preventDefault();
+      
+      const title = button.dataset.productName;
+      const price = parseFloat(button.dataset.productPrice);
+      const image = button.dataset.productImage;
+      const card = button.closest(".card");
+      const qtyInput = card.querySelector(".qty-input");
+      const quantity = parseInt(qtyInput.value) || 1;
 
-    const existingItem = cart.find((item) => item.title === title);
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      cart.push({ title, price, image, quantity });
-    }
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existingItem = cart.find((item) => item.title === title);
+      
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ title, price, image, quantity });
+      }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount();
-    alert(`${title} added to cart!`);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+      alert(`${title} added to cart!`);
+      qtyInput.value = 1;
+    });
+  });
+
+  // Quantity increment/decrement on products page
+  document.querySelectorAll('.increment-qty').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const input = this.previousElementSibling;
+      input.value = parseInt(input.value) + 1;
+    });
+  });
+
+  document.querySelectorAll('.decrement-qty').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const input = this.nextElementSibling;
+      if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+      }
+    });
   });
 });
 
@@ -165,9 +189,7 @@ function renderCart() {
 
   cart.forEach((item, index) => {
     const itemName = item.title || item.name || "Unnamed Product";
-    const itemImage = item.image
-      ? (item.image.includes('/frontend/') ? item.image : '/frontend/' + item.image)
-      : '/frontend/images/default.jpg';
+    const itemImage = item.image || '/storage/images/default.jpg';
     const itemPrice = parseFloat(item.price) || 0;
     const itemQty = parseInt(item.quantity) || 1;
     const itemTotal = itemPrice * itemQty;
@@ -175,7 +197,7 @@ function renderCart() {
 
     const row = `
       <tr>
-        <td><img src="${itemImage}" alt="${itemName}" class="cart-img"></td>
+        <td><img src="${itemImage}" alt="${itemName}" class="cart-img" style="width: 50px; height: 50px; object-fit: cover;"></td>
         <td>${itemName}</td>
         <td>$${itemPrice.toFixed(2)}</td>
         <td>
@@ -211,6 +233,7 @@ function incrementQty(e) {
   cart[index].quantity++;
   localStorage.setItem('cart', JSON.stringify(cart));
   renderCart();
+  updateCartCount();
 }
 
 function decrementQty(e) {
@@ -223,6 +246,7 @@ function decrementQty(e) {
   }
   localStorage.setItem('cart', JSON.stringify(cart));
   renderCart();
+  updateCartCount();
 }
 
 function removeItem(e) {
@@ -231,6 +255,7 @@ function removeItem(e) {
   cart.splice(index, 1);
   localStorage.setItem('cart', JSON.stringify(cart));
   renderCart();
+  updateCartCount();
 }
 
 //  Clear Cart
@@ -267,13 +292,25 @@ document.addEventListener("DOMContentLoaded", () => {
       checkoutForm.style.display = "none";
     } else {
       cart.forEach((item) => {
-        const safeImagePath = item.image.includes('/frontend/') ? item.image : '/frontend/' + item.image;
+        const itemImage = item.image || '/storage/images/default.jpg';
         const div = document.createElement("div");
         div.classList.add("checkout-item");
         div.innerHTML = `
-          <div class="checkout-item">
-            <img src="${safeImagePath}" alt="${item.title}" style="width:50px; height:50px; border-radius:6px; margin-right:10px;">
-            <span>${item.title} - ${item.quantity} × $${item.price}</span>
+          <div class="checkout-item mb-3 p-2 border-bottom">
+            <div class="row align-items-center">
+              <div class="col-md-2">
+                <img src="${itemImage}" alt="${item.title}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+              </div>
+              <div class="col-md-6">
+                <strong>${item.title}</strong>
+              </div>
+              <div class="col-md-2">
+                $${parseFloat(item.price).toFixed(2)}
+              </div>
+              <div class="col-md-2">
+                x${item.quantity}
+              </div>
+            </div>
           </div>
         `;
         checkoutItems.appendChild(div);
@@ -292,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Clear cart
       localStorage.removeItem("cart");
+      updateCartCount();
     });
   }
 });
@@ -367,26 +405,9 @@ if (reviewForm) {
 renderReviews();
 
 
-const addToCartDetailBtn = document.getElementById("addToCartDetail");
-if (addToCartDetailBtn && product) {
-  addToCartDetailBtn.addEventListener("click", () => {
-    const quantity = parseInt(document.getElementById("detailQty").value) || 1;
-    const title = product.name;
-    const price = parseFloat(product.price.replace("$", ""));
-    const image = product.image;
 
-    const existingItem = cart.find((item) => item.title === title);
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      cart.push({ title, price, image, quantity });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount();
-    alert(`${title} added to cart!`);
-  });
-}
+// ---------------------- PRODUCT DETAIL PAGE - ADD TO CART ----------------------
+// Handler is now in product-detail.blade.php as inline script
 
 
 /*$(document).ready(function(){

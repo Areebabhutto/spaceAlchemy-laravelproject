@@ -55,46 +55,20 @@
   <h1 class="heading text-center mb-5">Best Selling Products</h1>
 
   <div class="row g-4 justify-content-center">
-
-    <!-- Best Seller 1 -->
+    @foreach($bestSellingProducts as $product)
     <div class="col-md-4">
       <div class="card product-card text-center">
-        <a href="{{ url('/product-detail') }}?id=1">
-          <img src="{{ asset('frontend/images/sofa.jpg') }}" class="card-img-top" alt="Modern Sofa">
+        <a href="{{ url('/product-detail') }}?id={{ $product->id }}">
+          <img src="{{ asset('storage/'.$product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 250px; object-fit: cover;">
         </a>
         <div class="card-body">
-          <h5 class="card-title">Modern 3-Seater Sofa</h5>
-          <p class="card-text text-primary fw-bold">$799</p>
+          <h5 class="card-title">{{ $product->name }}</h5>
+          <p class="card-text text-primary fw-bold">${{ $product->price }}</p>
+          <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
         </div>
       </div>
     </div>
-
-    <!-- Best Seller 2 -->
-    <div class="col-md-4">
-      <div class="card product-card text-center">
-        <a href="{{ url('/product-detail') }}?id=5">
-          <img src="{{ asset('frontend/images/curtain.jpg') }}" class="card-img-top" alt="Luxury Curtains">
-        </a>
-        <div class="card-body">
-          <h5 class="card-title">Luxury Curtains</h5>
-          <p class="card-text text-primary fw-bold">$99</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Best Seller 3 -->
-    <div class="col-md-4">
-      <div class="card product-card text-center">
-        <a href="{{ url('/product-detail') }}?id=11">
-          <img src="{{ asset('frontend/images/mirror.jpg') }}" class="card-img-top" alt="Mirror">
-        </a>
-        <div class="card-body">
-          <h5 class="card-title">Mirror</h5>
-          <p class="card-text text-primary fw-bold">$899</p>
-        </div>
-      </div>
-    </div>
-
+    @endforeach
   </div>
 </section>
 
