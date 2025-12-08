@@ -100,4 +100,22 @@ class BackendServiceController extends Controller
         $service->delete();
         return redirect()->route('services.index')->with('success', 'Service deleted successfully!');
     }
+
+    /**
+     * Search services by title and description
+     */
+    public function search(Request $request) {
+        $query = $request->get('query', '');
+        
+        if (strlen($query) < 1) {
+            return response()->json([]);
+        }
+        
+        $services = Service::where('title', 'like', '%' . $query . '%')
+                          ->orWhere('description', 'like', '%' . $query . '%')
+                          ->limit(10)
+                          ->get();
+        
+        return response()->json($services);
+    }
 }

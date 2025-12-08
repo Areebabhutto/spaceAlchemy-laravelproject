@@ -2,9 +2,9 @@
     <x-slot name="header">
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Services
+                Packages
             </h2>
-            <a href="{{ route('services.create') }}" class="btn btn-primary">Add Service</a>
+            <a href="{{ route('packages.create') }}" class="btn btn-primary">Add Package</a>
         </div>
     </x-slot>
 
@@ -19,9 +19,9 @@
             <div class="input-group">
                 <input 
                     type="text" 
-                    id="serviceSearch" 
+                    id="packageSearch" 
                     class="form-control" 
-                    placeholder="Search by Title or Description..."
+                    placeholder="Search by Name or Description..."
                     autocomplete="off"
                 >
                 <button class="btn btn-primary" type="button" id="searchBtn">
@@ -33,40 +33,36 @@
         </div>
 
         <div class="overflow-hidden shadow-sm sm:rounded-lg">
-            <table class="table table-bordered" id="servicesTable">
+            <table class="table table-bordered" id="packagesTable">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Icon</th>
+                        <th>Name</th>
+                        <th>Product</th>
+                        <th>Services</th>
+                        <th>Price</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="servicesTableBody">
-                    @foreach($services as $service)
+                <tbody id="packagesTableBody">
+                    @foreach($packages as $package)
                     <tr>
-                        <td>{{ $service->id }}</td>
-                        <td>{{ $service->title }}</td>
-                        <td>{{ Str::limit($service->description, 50) }}</td>
+                        <td>{{ $package->id }}</td>
+                        <td>{{ $package->name }}</td>
+                        <td>{{ $package->product->name ?? 'N/A' }}</td>
                         <td>
-                            @if($service->icon)
-                                @if(Storage::disk('public')->exists($service->icon))
-                                    <img src="{{ asset('storage/' . $service->icon) }}" alt="{{ $service->title }}" style="max-width: 50px; max-height: 50px;">
-                                @else
-                                    <i class="fas {{ $service->icon }} fa-2x"></i>
-                                @endif
-                            @else
-                                <span class="text-muted">No icon</span>
-                            @endif
+                            @foreach($package->services as $service)
+                                <span class="badge bg-info">{{ $service->title }}</span>
+                            @endforeach
                         </td>
+                        <td>${{ $package->price }}</td>
                         <td>
-                            <a href="{{ route('services.edit', $service->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="{{ route('services.destroy', $service->id) }}" method="POST" style="display:inline;">
+                            <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <form action="{{ route('packages.destroy', $package->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure you want to delete this service?')">Delete</button>
+                                    onclick="return confirm('Are you sure you want to delete this package?')">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -82,11 +78,11 @@ const originalRows = [];
 
 // Store original rows on page load
 document.addEventListener('DOMContentLoaded', function() {
-    const tbody = document.getElementById('servicesTableBody');
+    const tbody = document.getElementById('packagesTableBody');
     originalRows.push(...tbody.querySelectorAll('tr'));
 });
 
-document.getElementById('serviceSearch').addEventListener('keyup', function() {
+document.getElementById('packageSearch').addEventListener('keyup', function() {
     const query = this.value.trim();
     const resultsDiv = document.getElementById('searchResults');
     
@@ -96,7 +92,7 @@ document.getElementById('serviceSearch').addEventListener('keyup', function() {
         return;
     }
     
-    fetch(`{{ route('services.search') }}?query=${encodeURIComponent(query)}`)
+    fetch(`{{ route('packages.search') }}?query=${encodeURIComponent(query)}`)
         .then(response => response.json())
         .then(data => {
             resultsDiv.innerHTML = '';
@@ -108,19 +104,19 @@ document.getElementById('serviceSearch').addEventListener('keyup', function() {
                 return;
             }
             
-            data.forEach(service => {
+            data.forEach(package => {
                 const resultItem = document.createElement('div');
                 resultItem.className = 'p-3 border-bottom cursor-pointer';
                 resultItem.style.cursor = 'pointer';
                 resultItem.innerHTML = `
-                    <div class="fw-bold">${service.title}</div>
-                    <div class="small text-muted">${service.description.substring(0, 50)}...</div>
+                    <div class="fw-bold">${package.name}</div>
+                    <div class="small text-muted">$${package.price}</div>
                 `;
                 
                 resultItem.addEventListener('click', function() {
-                    document.getElementById('serviceSearch').value = service.title;
+                    document.getElementById('packageSearch').value = package.name;
                     resultsDiv.style.display = 'none';
-                    updateTable([service]);
+                    updateTable([package]);
                 });
                 
                 resultItem.addEventListener('mouseenter', function() {
@@ -142,7 +138,7 @@ document.getElementById('serviceSearch').addEventListener('keyup', function() {
 
 // Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
-    const searchInput = document.getElementById('serviceSearch');
+    const searchInput = document.getElementById('packageSearch');
     const resultsDiv = document.getElementById('searchResults');
     const searchBtn = document.getElementById('searchBtn');
     
@@ -151,34 +147,31 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function updateTable(services) {
-    const tbody = document.getElementById('servicesTableBody');
+function updateTable(packages) {
+    const tbody = document.getElementById('packagesTableBody');
     tbody.innerHTML = '';
     
-    if (services.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No services found</td></tr>';
+    if (packages.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No packages found</td></tr>';
         return;
     }
     
-    services.forEach(service => {
-        const iconHtml = service.icon ? 
-            (service.icon.includes('/') ? 
-                `<img src="/storage/${service.icon}" alt="${service.title}" style="max-width: 50px; max-height: 50px;">` :
-                `<i class="fas ${service.icon} fa-2x"></i>`) :
-            '<span class="text-muted">No icon</span>';
+    packages.forEach(package => {
+        const servicesBadges = package.services.map(s => `<span class="badge bg-info">${s.title}</span>`).join(' ');
         
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${service.id}</td>
-            <td>${service.title}</td>
-            <td>${service.description.substring(0, 50)}...</td>
-            <td>${iconHtml}</td>
+            <td>${package.id}</td>
+            <td>${package.name}</td>
+            <td>${package.product.name}</td>
+            <td>${servicesBadges}</td>
+            <td>$${package.price}</td>
             <td>
-                <a href="/admin/services/${service.id}/edit" class="btn btn-sm btn-warning">Edit</a>
-                <form action="/admin/services/${service.id}" method="POST" style="display:inline;">
+                <a href="/admin/packages/${package.id}/edit" class="btn btn-sm btn-warning">Edit</a>
+                <form action="/admin/packages/${package.id}" method="POST" style="display:inline;">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this service?')">Delete</button>
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this package?')">Delete</button>
                 </form>
             </td>
         `;
@@ -187,11 +180,10 @@ function updateTable(services) {
 }
 
 function resetTable() {
-    const tbody = document.getElementById('servicesTableBody');
+    const tbody = document.getElementById('packagesTableBody');
     tbody.innerHTML = '';
     
     if (originalRows.length === 0) {
-        // If no original rows stored, reload the page
         location.reload();
         return;
     }
@@ -201,7 +193,7 @@ function resetTable() {
     });
 }
 
-document.getElementById('serviceSearch').addEventListener('input', function() {
+document.getElementById('packageSearch').addEventListener('input', function() {
     if (this.value.trim().length === 0) {
         resetTable();
         document.getElementById('searchResults').style.display = 'none';

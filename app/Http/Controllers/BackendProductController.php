@@ -102,4 +102,22 @@ public function update(Request $request, Product $product) {
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully!');
     }
+
+    /**
+     * Search products by name and description
+     */
+    public function search(Request $request) {
+        $query = $request->get('query', '');
+        
+        if (strlen($query) < 1) {
+            return response()->json([]);
+        }
+        
+        $products = Product::where('name', 'like', '%' . $query . '%')
+                          ->orWhere('description', 'like', '%' . $query . '%')
+                          ->limit(10)
+                          ->get();
+        
+        return response()->json($products);
+    }
 }

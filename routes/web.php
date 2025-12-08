@@ -34,8 +34,14 @@ Route::middleware('auth')->group(function () {
 
 // Admin routes
 Route::prefix('admin')->middleware(['auth'])->group(function () {
+    // Search routes must come BEFORE resource routes
+    Route::get('/products/search', [BackendProductController::class, 'search'])->name('products.search');
+    Route::get('/services/search', [\App\Http\Controllers\BackendServiceController::class, 'search'])->name('services.search');
+    Route::get('/packages/search', [\App\Http\Controllers\BackendPackageController::class, 'search'])->name('packages.search');
+    
     Route::resource('products', BackendProductController::class);
     Route::resource('services', \App\Http\Controllers\BackendServiceController::class);
+    Route::resource('packages', \App\Http\Controllers\BackendPackageController::class);
 });
 
 require __DIR__.'/auth.php';
