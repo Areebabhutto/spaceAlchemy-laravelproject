@@ -39,6 +39,7 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Price</th>
+                        <th>Image</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -48,6 +49,17 @@
                         <td>{{ $product->id }}</td>
                         <td>{{ $product->name }}</td>
                         <td>${{ $product->price }}</td>
+                        <td>
+                            @if($product->image)
+                                @if(Storage::disk('public')->exists($product->image))
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-width: 50px; max-height: 50px; border-radius: 4px;">
+                                @else
+                                    <span class="text-muted">File not found</span>
+                                @endif
+                            @else
+                                <span class="text-muted">No image</span>
+                            @endif
+                        </td>
                         <td>
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-warning">Edit</a>
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
@@ -144,16 +156,18 @@ function updateTable(products) {
     tbody.innerHTML = '';
     
     if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No products found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No products found</td></tr>';
         return;
     }
     
     products.forEach(product => {
         const row = document.createElement('tr');
+        const imageHtml = product.image ? `<img src="/storage/${product.image}" alt="${product.name}" style="max-width: 50px; max-height: 50px; border-radius: 4px;">` : '<span class="text-muted">No image</span>';
         row.innerHTML = `
             <td>${product.id}</td>
             <td>${product.name}</td>
             <td>$${product.price}</td>
+            <td>${imageHtml}</td>
             <td>
                 <a href="/admin/products/${product.id}/edit" class="btn btn-sm btn-warning">Edit</a>
                 <form action="/admin/products/${product.id}" method="POST" style="display:inline;">
