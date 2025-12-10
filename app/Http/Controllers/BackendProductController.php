@@ -19,17 +19,6 @@ class BackendProductController extends Controller
         return view('admin.products.create');
     }
 
-    // public function store(Request $request) {
-    //     $request->validate([
-    //         'name' => 'required',
-    //         'price' => 'required|numeric',
-    //     ]);
-    //     $data = request()->except(['_token', '_method']);
-    //     $product = Product::create($data);
-
-    //     return redirect()->route('products.index')->with('success', 'Product added successfully!');
-    // }
-
 
     public function store(Request $request) {
         $request->validate([
