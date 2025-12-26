@@ -44,18 +44,14 @@
                     </tr>
                 </thead>
                 <tbody id="servicesTableBody">
-                    @foreach($services as $service)
+                    @forelse($services as $service)
                     <tr>
                         <td>{{ $service->id }}</td>
                         <td>{{ $service->title }}</td>
                         <td>{{ Str::limit($service->description, 50) }}</td>
                         <td>
                             @if($service->icon)
-                                @if(Storage::disk('public')->exists($service->icon))
-                                    <img src="{{ asset('storage/' . $service->icon) }}" alt="{{ $service->title }}" style="max-width: 50px; max-height: 50px;">
-                                @else
-                                    <i class="fas {{ $service->icon }} fa-2x"></i>
-                                @endif
+                                <img src="{{ asset('storage/' . $service->icon) }}" alt="{{ $service->title }}" style="max-width: 50px; max-height: 50px; object-fit: cover;">
                             @else
                                 <span class="text-muted">No icon</span>
                             @endif
@@ -70,7 +66,11 @@
                             </form>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No services found</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

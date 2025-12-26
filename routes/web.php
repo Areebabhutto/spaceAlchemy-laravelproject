@@ -10,6 +10,7 @@ use App\Http\Controllers\Frontend\LoginController;
 use App\Http\Controllers\Frontend\ProductDetailController; 
 use App\Http\Controllers\Frontend\ProductsController; 
 use App\Http\Controllers\Frontend\SignupController;
+use App\Http\Controllers\OrderController;
 
 // Frontend routes
 Route::get('/', [IndexController::class, 'index']);
@@ -42,6 +43,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('products', BackendProductController::class);
     Route::resource('services', \App\Http\Controllers\BackendServiceController::class);
     Route::resource('packages', \App\Http\Controllers\BackendPackageController::class);
+    
+    // Orders routes
+    Route::resource('orders', OrderController::class)->names('admin.orders');
+    Route::get('/orders/export/csv', [OrderController::class, 'export'])->name('admin.orders.export');
 });
 
 require __DIR__.'/auth.php';

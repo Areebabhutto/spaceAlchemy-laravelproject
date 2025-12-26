@@ -45,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody id="packagesTableBody">
-                    @foreach($packages as $package)
+                    @forelse($packages as $package)
                     <tr>
                         <td>{{ $package->id }}</td>
                         <td>{{ $package->name }}</td>
@@ -66,7 +66,11 @@
                             </form>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No packages found</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

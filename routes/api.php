@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PackageApiController;
+use App\Http\Controllers\Api\OrderApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,19 @@ use App\Http\Controllers\Api\PackageApiController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:api');
+
+
+// Orders API Routes
+Route::prefix('orders')->group(function () {
+    // Save order from checkout
+    Route::post('/', [OrderApiController::class, 'store']);
+    
+    // Get user's orders (protected)
+        Route::get('/{order}', [OrderApiController::class, 'show']);
 });
 
 // Package API Routes

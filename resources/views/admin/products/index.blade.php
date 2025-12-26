@@ -44,18 +44,14 @@
                     </tr>
                 </thead>
                 <tbody id="productsTableBody">
-                    @foreach($products as $product)
+                    @forelse($products as $product)
                     <tr>
                         <td>{{ $product->id }}</td>
                         <td>{{ $product->name }}</td>
                         <td>${{ $product->price }}</td>
                         <td>
                             @if($product->image)
-                                @if(Storage::disk('public')->exists($product->image))
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-width: 50px; max-height: 50px; border-radius: 4px;">
-                                @else
-                                    <span class="text-muted">File not found</span>
-                                @endif
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-width: 50px; max-height: 50px; border-radius: 4px; object-fit: cover;">
                             @else
                                 <span class="text-muted">No image</span>
                             @endif
@@ -70,7 +66,11 @@
                             </form>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No products found</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

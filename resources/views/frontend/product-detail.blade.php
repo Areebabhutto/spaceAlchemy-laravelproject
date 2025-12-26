@@ -40,6 +40,9 @@
     </div>
 </section>
 
+<!-- Include the checkout service -->
+<script src="/frontend/checkout.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const addToCartDetailBtn = document.getElementById("addToCartDetail");
@@ -50,32 +53,29 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const detailQty = document.getElementById("detailQty");
       const quantity = parseInt(detailQty.value) || 1;
-      const title = this.dataset.productName;
-      const price = parseFloat(this.dataset.productPrice);
-      const image = this.dataset.productImage;
+      const productId = parseInt(this.dataset.productId);
+      const productName = this.dataset.productName;
+      const productPrice = parseFloat(this.dataset.productPrice);
+      const productImage = this.dataset.productImage;
 
-      console.log("Adding to cart - Detail Page", { title, price, image, quantity });
+      console.log("Adding to cart - Detail Page", { productId, productName, productPrice, productImage, quantity });
 
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existingItem = cart.find((item) => item.title === title);
+      // Use the orderCheckout service
+      const product = {
+        id: productId,
+        name: productName,
+        price: productPrice,
+      };
       
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push({ title, price, image, quantity });
-      }
-
-      localStorage.setItem("cart", JSON.stringify(cart));
-      console.log("Cart saved:", cart);
+      orderCheckout.addToCart(product, quantity);
       
       // Update cart count
       const cartCount = document.getElementById("cart-count");
       if (cartCount) {
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = totalItems;
+        cartCount.textContent = orderCheckout.getCartItemsCount();
       }
       
-      alert(`${title} added to cart!`);
+      alert(`${productName} added to cart!`);
       detailQty.value = 1;
     });
   }
