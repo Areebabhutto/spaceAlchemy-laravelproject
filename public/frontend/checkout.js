@@ -37,14 +37,16 @@ class OrderCheckoutService {
     /**
      * Add item to cart
      */
-    addToCart(product, quantity = 1, packageId = null) {
+    addToCart(product, quantity = 1, packageId = null, image = null) {
         const item = {
             product_id: product.id,
             name: product.name,
+            title: product.name, // For compatibility with cart.blade.php
             price: parseFloat(product.price),
             quantity: quantity,
             package_id: packageId,
             packageName: null,
+            image: image || null, // Add image to cart item
         };
 
         const existingItem = this.cartItems.find(

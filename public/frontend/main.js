@@ -189,7 +189,14 @@ function renderCart() {
 
   cart.forEach((item, index) => {
     const itemName = item.title || item.name || "Unnamed Product";
-    const itemImage = item.image || '/storage/images/default.jpg';
+    let itemImage = item.image || '/storage/images/default.jpg';
+    
+    // Ensure image URL is properly formatted
+    // If image path doesn't start with http or /, prepend /storage/
+    if (itemImage && !itemImage.startsWith('http') && !itemImage.startsWith('/')) {
+      itemImage = '/storage/' + itemImage;
+    }
+    
     const itemPrice = parseFloat(item.price) || 0;
     const itemQty = parseInt(item.quantity) || 1;
     const itemTotal = itemPrice * itemQty;
@@ -197,7 +204,7 @@ function renderCart() {
 
     const row = `
       <tr>
-        <td><img src="${itemImage}" alt="${itemName}" class="cart-img" style="width: 50px; height: 50px; object-fit: cover;"></td>
+        <td><img src="${itemImage}" alt="${itemName}" class="cart-img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" onerror="this.src='/storage/images/default.jpg'"></td>
         <td>${itemName}</td>
         <td>$${itemPrice.toFixed(2)}</td>
         <td>
@@ -292,14 +299,21 @@ document.addEventListener("DOMContentLoaded", () => {
       checkoutForm.style.display = "none";
     } else {
       cart.forEach((item) => {
-        const itemImage = item.image || '/storage/images/default.jpg';
+        let itemImage = item.image || '/storage/images/default.jpg';
+        
+        // Ensure image URL is properly formatted
+        // If image path doesn't start with http or /, prepend /storage/
+        if (itemImage && !itemImage.startsWith('http') && !itemImage.startsWith('/')) {
+          itemImage = '/storage/' + itemImage;
+        }
+        
         const div = document.createElement("div");
         div.classList.add("checkout-item");
         div.innerHTML = `
           <div class="checkout-item mb-3 p-2 border-bottom">
             <div class="row align-items-center">
               <div class="col-md-2">
-                <img src="${itemImage}" alt="${item.title}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+                <img src="${itemImage}" alt="${item.title}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;" onerror="this.src='/storage/images/default.jpg'">
               </div>
               <div class="col-md-6">
                 <strong>${item.title}</strong>
@@ -523,10 +537,16 @@ function displayCartItems() {
   cart.forEach((item, index) => {
     total += item.price * item.quantity;
 
+    let itemImage = item.image || '/storage/images/default.jpg';
+    // Ensure image URL is properly formatted
+    if (itemImage && !itemImage.startsWith('http') && !itemImage.startsWith('/')) {
+      itemImage = '/storage/' + itemImage;
+    }
+
     const itemHTML = `
       <div class="col-md-4">
         <div class="card">
-          <img src="${item.image}" class="card-img-top" alt="${item.title}">
+          <img src="${itemImage}" class="card-img-top" alt="${item.title}" onerror="this.src='/storage/images/default.jpg'">
           <div class="card-body text-center">
             <h5 class="card-title">${item.title}</h5>
             <p class="card-text">$${item.price} x ${item.quantity}</p>
@@ -620,11 +640,17 @@ document.addEventListener("DOMContentLoaded", () => {
     checkoutItems.innerHTML = "<p>Your cart is empty.</p>";
   } else {
     cart.forEach((item) => {
+      let itemImage = item.image || '/storage/images/default.jpg';
+      // Ensure image URL is properly formatted
+      if (itemImage && !itemImage.startsWith('http') && !itemImage.startsWith('/')) {
+        itemImage = '/storage/' + itemImage;
+      }
+
       const div = document.createElement("div");
       div.classList.add("checkout-item");
       div.innerHTML = `
       <div class="checkout-item">
-  <img src="${item.image}" alt="${item.title}" style="width:50px; height:50px; border-radius:6px; margin-right:10px;">
+  <img src="${itemImage}" alt="${item.title}" style="width:50px; height:50px; border-radius:6px; margin-right:10px;" onerror="this.src='/storage/images/default.jpg'">
   <span>${item.title} - ${item.quantity} × $${item.price}</span>
 </div>
 

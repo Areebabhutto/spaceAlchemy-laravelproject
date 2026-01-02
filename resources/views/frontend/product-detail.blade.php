@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
         price: productPrice,
       };
       
-      orderCheckout.addToCart(product, quantity);
+      orderCheckout.addToCart(product, quantity, null, productImage);
       
       // Update cart count
       const cartCount = document.getElementById("cart-count");
