@@ -2,46 +2,41 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PackageApiController;
 use App\Http\Controllers\Api\OrderApiController;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| API Routes (Passport)
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+// =====================
+// AUTH ROUTES
+// =====================
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
+
+// Get authenticated user
+Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
 
-
-// Orders API Routes
-Route::prefix('orders')->group(function () {
-    // Save order from checkout
+// =====================
+// ORDERS API ROUTES
+// =====================
+Route::middleware('auth:api')->prefix('orders')->group(function () {
     Route::post('/', [OrderApiController::class, 'store']);
-    
-    // Get user's orders (protected)
-        Route::get('/{order}', [OrderApiController::class, 'show']);
+    Route::get('/{order}', [OrderApiController::class, 'show']);
 });
 
-// Package API Routes
-Route::prefix('packages')->group(function () {
-    // Search packages by name or description
-    Route::get('search', [PackageApiController::class, 'search']);
-    
-    // Get packages by product ID
-    Route::get('product/{productId}', [PackageApiController::class, 'getByProduct']);
-    
-    // Standard REST endpoints
+// =====================
+// PACKAGES API ROUTES
+// =====================
+Route::middleware('auth:api')->prefix('packages')->group(function () {
+    Route::get('/search', [PackageApiController::class, 'search']);
+    Route::get('/product/{productId}', [PackageApiController::class, 'getByProduct']);
     Route::get('/', [PackageApiController::class, 'index']);
     Route::get('/{id}', [PackageApiController::class, 'show']);
     Route::post('/', [PackageApiController::class, 'store']);
